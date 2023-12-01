@@ -159,6 +159,7 @@ public class PlanificacionDeDisco_GRUPO01 extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -532,9 +533,9 @@ public class PlanificacionDeDisco_GRUPO01 extends javax.swing.JFrame {
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 130, -1, -1));
 
         jLabel4.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        jLabel4.setText("ALGORITMO MENOR:");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 480, -1, -1));
-        getContentPane().add(txtAlgoritmoElegir, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 470, 210, 40));
+        jLabel4.setText("PROMEDIO");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 500, -1, -1));
+        getContentPane().add(txtAlgoritmoElegir, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 480, 210, 40));
 
         jLabel6.setFont(new java.awt.Font("Roboto Black", 1, 18)); // NOI18N
         jLabel6.setText("Tabla de algoritmos:");
@@ -547,6 +548,10 @@ public class PlanificacionDeDisco_GRUPO01 extends javax.swing.JFrame {
         jLabel19.setFont(new java.awt.Font("Roboto Black", 1, 18)); // NOI18N
         jLabel19.setText("Ingreso de datos:");
         getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, -1, -1));
+
+        jLabel20.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        jLabel20.setText("ALGORITMO CON MENOR:");
+        getContentPane().add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 480, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -573,53 +578,43 @@ public class PlanificacionDeDisco_GRUPO01 extends javax.swing.JFrame {
         txtPeticion.setText("");
     }//GEN-LAST:event_btnAgregarActionPerformed
     
-    
-    private static int buscarPistaCercana(int cabezal, ArrayList<Integer> peticiones) {
-        int pistaMasCercana = Integer.MAX_VALUE;
-        for (int peticion : peticiones) {
-            if (peticion > cabezal && peticion < pistaMasCercana) {
-                pistaMasCercana = peticion;
-            }
-        }
-        return pistaMasCercana;
-    }
-    
-    private static ArrayList<Integer> ordenarPeticiones(int cabezal, int pistaMasCercana, ArrayList<Integer> peticiones) {
-        ArrayList<Integer> peticionesOrdenadas = new ArrayList<>();
-        peticionesOrdenadas.add(pistaMasCercana);
-
-        while (!peticiones.isEmpty()) {
-            int pistaSiguiente = buscarPistaCercana(cabezal, peticiones);
-            if (pistaSiguiente == Integer.MAX_VALUE) {
-                break;  // No hay más pistas por atender
-            }
-            peticionesOrdenadas.add(pistaSiguiente);
-            peticiones.remove(Integer.valueOf(pistaSiguiente));  // Remover la pista atendida
-        }
-
-        return peticionesOrdenadas;
-    }
-    
     private void simularCSCAN(){
-
-        // Buscar la pista más cercana mayor al número del cabezal
-        int pistaMasCercana = buscarPistaCercana(posicionInicialCabezal, listaPeticionesCSCAN);
         
-        // Ordenar peticiones desde la pista más cercana hasta la mayor
-        ArrayList<Integer> peticionesOrdenadas = ordenarPeticiones(posicionInicialCabezal, pistaMasCercana, listaPeticionesCSCAN);
+        // Filtrar peticiones mayores al cabezal
+        ArrayList<Integer> peticionesMayores = new ArrayList<>();
+        for (int peticion : listaPeticionesCSCAN) {
+            if (peticion > posicionInicialCabezal) {
+                peticionesMayores.add(peticion);
+            }
+        }
+        // Ordenar peticiones mayores en forma ascendente
+        Collections.sort(peticionesMayores);
+        
+        // Filtrar peticiones menores o iguales al cabezal
+        ArrayList<Integer> peticionesMenores = new ArrayList<>();
+        for (int peticion : listaPeticionesCSCAN) {
+            if (peticion <= posicionInicialCabezal) {
+                peticionesMenores.add(peticion);
+            }
+        }
+        // Ordenar peticiones menores en forma ascendente
+        Collections.sort(peticionesMenores);
+
+        // Combinar las dos listas ordenadas
+        ArrayList<Integer> peticionesOrdenadas = new ArrayList<>(peticionesMayores);
+        peticionesOrdenadas.addAll(peticionesMenores);
         
         for (int peticion : peticionesOrdenadas) {
             System.out.println("Atendiendo pista CSCAN: " + peticion);
             txtAreaPeticiones.append("Atendiendo pista CSCAN: " + peticion + "\n");
             modeloTablaCSCAN.addRow(new Object[]{peticion});
         }
-        int pistasRecorridas = calcularPistasRecorridas(posicionInicialCabezal, peticionesOrdenadas);
         
-        double promedioRecorridoCSCAN = (double) pistasRecorridas / listaPeticionesCSCAN.size();
+        promedioRecorridoCSCAN = (double) pistasRecorridas / listaPeticionesCSCAN.size();
         txtPistasRecorridasCSCAN.setText(""+pistasRecorridas);
         txtPromedioRecorridoCSCAN.setText(""+promedioRecorridoCSCAN);
     }
-    
+      
     private void ordenarPeticiones() {
         int cabezaActual = posicionInicialCabezal;
 
@@ -646,18 +641,36 @@ public class PlanificacionDeDisco_GRUPO01 extends javax.swing.JFrame {
     }
     
     private void simularSCAN(){
-        // Buscar la pista más cercana mayor al número del cabezal
-        int pistaMasCercana = buscarPistaCercana(posicionInicialCabezal, listaPeticionesSCAN);
         
-         // Ordenar peticiones desde la pista más cercana hasta la mayor
-        ArrayList<Integer> peticionesOrdenadas = ordenarPeticiones(posicionInicialCabezal, pistaMasCercana, listaPeticionesSCAN);
+        // Filtrar peticiones mayores al cabezal
+        ArrayList<Integer> peticionesMayores = new ArrayList<>();
+        for (int peticion : listaPeticionesSCAN) {
+            if (peticion > posicionInicialCabezal) {
+                peticionesMayores.add(peticion);
+            }
+        }
+        // Ordenar peticiones mayores en forma ascendente
+        Collections.sort(peticionesMayores);
+        
+        // Filtrar peticiones menores o iguales al cabezal
+        ArrayList<Integer> peticionesMenores = new ArrayList<>();
+        for (int peticion : listaPeticionesSCAN) {
+            if (peticion <= posicionInicialCabezal) {
+                peticionesMenores.add(peticion);
+            }
+        }
+        // Ordenar peticiones menores en forma descendente
+        Collections.sort(peticionesMenores, Collections.reverseOrder());
+
+        // Combinar las dos listas ordenadas
+        ArrayList<Integer> peticionesOrdenadas = new ArrayList<>(peticionesMayores);
+        peticionesOrdenadas.addAll(peticionesMenores);
         
         for (int peticion : peticionesOrdenadas) {
             System.out.println("Atendiendo pista SCAN: " + peticion);
             txtAreaPeticiones.append("Atendiendo pista SCAN: " + peticion + "\n");
             modeloTablaSCAN.addRow(new Object[]{peticion});
         }
-        
         int pistasRecorridas = calcularPistasRecorridas(posicionInicialCabezal, peticionesOrdenadas);
         
         promedioRecorridoSCAN = (double) pistasRecorridas / listaPeticionesSCAN.size();
@@ -831,7 +844,7 @@ public class PlanificacionDeDisco_GRUPO01 extends javax.swing.JFrame {
                 simularCLOOK();
                 
                 // Encontrar el valor menor
-                double valorMenor = encontrarValorMenor(promedioRecorridoFIFO, promedioRecorridoSSTF, promedioRecorridoLOOK, promedioRecorridoCLOOK);
+                double valorMenor = encontrarValorMenor(promedioRecorridoFIFO, promedioRecorridoSSTF,promedioRecorridoSCAN, promedioRecorridoLOOK, promedioRecorridoCLOOK);
                 txtAlgoritmoElegir.setText(""+valorMenor);
             }catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Ingrese una posición válida para el cabezal");
@@ -939,6 +952,7 @@ public class PlanificacionDeDisco_GRUPO01 extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
