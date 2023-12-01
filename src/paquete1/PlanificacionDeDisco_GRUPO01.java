@@ -844,7 +844,7 @@ public class PlanificacionDeDisco_GRUPO01 extends javax.swing.JFrame {
                 simularCLOOK();
                 
                 // Encontrar el valor menor
-                double valorMenor = encontrarValorMenor(promedioRecorridoFIFO, promedioRecorridoSSTF,promedioRecorridoSCAN, promedioRecorridoLOOK, promedioRecorridoCLOOK);
+                double valorMenor = encontrarValorMenor(promedioRecorridoFIFO, promedioRecorridoSSTF,promedioRecorridoSCAN, promedioRecorridoCSCAN, promedioRecorridoLOOK, promedioRecorridoCLOOK);
                 txtAlgoritmoElegir.setText(""+valorMenor);
             }catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Ingrese una posición válida para el cabezal");
